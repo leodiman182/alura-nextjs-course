@@ -169,16 +169,14 @@ export function Icon({ as, styleSheet, ...props }) {
   const { iconVariant, ...restStyleSheet } = styleSheet;
   const styleSheetUpdated = restStyleSheet;
 
-  console.log('iconVariant', iconVariant);
-
   return (
     <Box
       as={FontAwesomeIcon}
       icon={iconSet[`fa${capitalize(iconVariant)}`]}
       crossOrigin="anonymous"
       styleSheet={{
-        width: '1.5ch',
-        height: '1.5ch',
+        width: '10px',
+        height: '10px',
         ...styleSheetUpdated,
       }}
       {...props}

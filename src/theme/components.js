@@ -1,6 +1,6 @@
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import * as iconSet from '@fortawesome/free-solid-svg-icons';
+import * as iconSet from "@fortawesome/free-solid-svg-icons";
 
 import { theme } from './theme';
 
@@ -24,19 +24,15 @@ function renderCSSValue(cssPropName, cssPropValue) {
 
   return cssPropName + ':' + cssPropValue + ';';
 }
-
 function renderCSS(props, currentBreakpoint) {
   if (!props) return '';
 
-  return Object.keys(props)
+  return Object
+    .keys(props)
     .map((prop) => {
-      const cssPropName = prop
-        .split(/(?=[A-Z])/)
-        .join('-')
-        .toLowerCase();
+      const cssPropName = prop.split(/(?=[A-Z])/).join('-').toLowerCase();
       const cssPropValue = props[prop];
-      const isCssPropValueAnObject =
-        Object.prototype.toString.call(cssPropValue) === '[object Object]';
+      const isCssPropValueAnObject = Object.prototype.toString.call(cssPropValue) === '[object Object]';
       const currentCssPropValue = cssPropValue[currentBreakpoint];
 
       if (currentBreakpoint == 'xs' && !isCssPropValueAnObject) {
@@ -46,26 +42,19 @@ function renderCSS(props, currentBreakpoint) {
       if (currentCssPropValue) {
         return renderCSSValue(cssPropName, currentCssPropValue);
       }
-    })
-    .filter(Boolean)
-    .join('');
+    }).filter(Boolean).join('');
 }
 
-export function Box({
+export const Box = React.forwardRef(({
   as,
   styleSheet: { focus, hover, srOnly, ...styleSheet },
   ...props
-}) {
+}, ref) => {
   const Tag = as || 'div';
 
   return (
     <React.Fragment>
-      <Tag
-        {...props}
-        className={`${props.className ? props.className : ''} ${
-          srOnly ? 'sr-only' : ''
-        }`}
-      />
+      <Tag ref={ref} {...props} className={`${props.className ? props.className : ''} ${srOnly ? 'sr-only' : ''}`} />
       <style jsx>{`
         ${Tag} {
           ${renderCSS(styleSheet, 'xs')};
@@ -76,9 +65,7 @@ export function Box({
         ${Tag}:focus {
           ${renderCSS(focus, 'xs')};
         }
-        @media screen and (min-width: ${theme.breakpoints[
-            'Breakpoints.sm'
-          ]}px) {
+        @media screen and (min-width: ${theme.breakpoints['Breakpoints.sm']}px) {
           ${Tag} {
             ${renderCSS(styleSheet, 'sm')};
           }
@@ -89,9 +76,7 @@ export function Box({
             ${renderCSS(focus, 'sm')};
           }
         }
-        @media screen and (min-width: ${theme.breakpoints[
-            'Breakpoints.md'
-          ]}px) {
+        @media screen and (min-width: ${theme.breakpoints['Breakpoints.md']}px) {
           ${Tag} {
             ${renderCSS(styleSheet, 'md')};
           }
@@ -102,9 +87,7 @@ export function Box({
             ${renderCSS(focus, 'md')};
           }
         }
-        @media screen and (min-width: ${theme.breakpoints[
-            'Breakpoints.lg'
-          ]}px) {
+        @media screen and (min-width: ${theme.breakpoints['Breakpoints.lg']}px) {
           ${Tag} {
             ${renderCSS(styleSheet, 'lg')};
           }
@@ -115,9 +98,7 @@ export function Box({
             ${renderCSS(focus, 'lg')};
           }
         }
-        @media screen and (min-width: ${theme.breakpoints[
-            'Breakpoints.xl'
-          ]}px) {
+        @media screen and (min-width: ${theme.breakpoints['Breakpoints.xl']}px) {
           ${Tag} {
             ${renderCSS(styleSheet, 'xl')};
           }
@@ -130,92 +111,83 @@ export function Box({
         }
       `}</style>
     </React.Fragment>
-  );
-}
-
-/* @media screen and (min-width: ${theme.breakpoints['Breakpoints.md']}px) {
-          ${renderCSS(styleSheet, 'md')};
-          :hover {
-            ${renderCSS(hover, 'md')};
-          }
-          :focus {
-            ${renderCSS(focus, 'md')};
-          }
-        }
-        @media screen and (min-width: ${theme.breakpoints['Breakpoints.lg']}px) {
-          ${renderCSS(styleSheet, 'lg')};
-          :hover {
-            ${renderCSS(hover, 'lg')};
-          }
-          :focus {
-            ${renderCSS(focus, 'lg')};
-          }
-        }
-        @media screen and (min-width: ${theme.breakpoints['Breakpoints.xl']}px) {
-          ${renderCSS(styleSheet, 'xl')};
-          :hover {
-            ${renderCSS(hover, 'xl')};
-          }
-          :focus {
-            ${renderCSS(focus, 'xl')};
-          }
-        } */
+  )
+});
 
 Box.defaultProps = {
   styleSheet: {},
 };
 
-export function Icon({ as, styleSheet, ...props }) {
-  const { iconVariant, ...restStyleSheet } = styleSheet;
-  const styleSheetUpdated = restStyleSheet;
+export function Icon({
+  as,
+  styleSheet: initialStyleSheet,
+  ...props
+  }) {
+  const Tag = 'svg';
+  const {
+    iconVariant,
+    hover,
+    focus,
+    ...restStyleSheet
+  } = initialStyleSheet;
+  const styleSheet = {
+      width: '1.5ch',
+      height: '1.5ch',
+      ...restStyleSheet
+  };
 
   return (
-    <Box
-      as={FontAwesomeIcon}
-      icon={iconSet[`fa${capitalize(iconVariant)}`]}
-      crossOrigin="anonymous"
-      styleSheet={{
-        width: '10px',
-        height: '10px',
-        ...styleSheetUpdated,
-      }}
-      {...props}
-    />
-  );
+    <React.Fragment>
+      <Box styleSheet={styleSheet}>
+        <FontAwesomeIcon
+          icon={iconSet[`fa${capitalize(iconVariant)}`]}
+          crossOrigin="anonymous"
+          {...props}
+        />
+      </Box>
+    </React.Fragment>
+  )
 }
 
-export function Text({ as, styleSheet, ...props }) {
+export const Text = React.forwardRef(({ as, styleSheet, ...props }, ref) => {
   const {
     textVariant = {
       fontSize: 'inherit',
     },
     ...restStyleSheet
   } = styleSheet;
-  const styleSheetUpdated = {
-    ...textVariant,
-    ...restStyleSheet,
-    // hover: {
-    //   color: theme.colors.primary[300],
-    // },
-  };
+  const styleSheetUpdated = { ...textVariant, ...restStyleSheet };
   const tag = as || 'span';
-  return <Box as={tag} styleSheet={styleSheetUpdated} {...props} />;
-}
-
+  return (
+    <Box
+      ref={ref}
+      as={tag}
+      styleSheet={styleSheetUpdated}
+      {...props}
+    />
+  )
+});
 Text.defaultProps = {
   styleSheet: {},
 };
 
 export function Image({ as, ...props }) {
-  const tag = as || 'img';
-  const { children, dangerouslySetInnerHTML, ...imageProps } = props;
+  const tag = 'img';
+  const {
+    children,
+    dangerouslySetInnerHTML,
+    ...imageProps
+  } = props;
 
-  return <Box as={tag} {...imageProps} />;
+
+  return (
+    <Box as={tag} {...imageProps} />
+  );
 }
-
 Image.defaultProps = {
   styleSheet: {},
 };
+
 
 export function Input({ as, styleSheet, ...props }) {
   const tag = 'input';
@@ -226,7 +198,7 @@ export function Input({ as, styleSheet, ...props }) {
     color: theme.colors.neutral[900],
     boxShadow: `0 5px 7px -5px ${theme.colors.neutral[999]}43`,
     display: 'block',
-    width: theme.space['x1/1'],
+    width: theme.space["x1/1"],
     border: `1px solid ${theme.colors.neutral[300]}`,
     borderRadius: theme.space.x2,
     paddingHorizontal: theme.space.x5,
@@ -237,31 +209,36 @@ export function Input({ as, styleSheet, ...props }) {
     },
     ...styleSheet,
   };
+  
 
-  return <Text as={tag} styleSheet={finalStyleSheet} {...props} />;
+  return (
+    <Text as={tag} styleSheet={finalStyleSheet} {...props} />
+  );
 }
-
 Input.defaultProps = {
   styleSheet: {},
 };
 
 export function Button({ as, styleSheet, ...props }) {
-  const { buttonVariant = 'primary', ...restStyleSheet } = styleSheet;
+  const {
+    buttonVariant = 'primary',
+    ...restStyleSheet
+  } = styleSheet;
   const tag = 'button';
 
   const finalStyleSheet = {
     cursor: 'pointer',
     textVariant: theme.typography.variants.body2,
-    color: theme.colors.neutral['000'],
-    boxShadow: `0 5px 7px -5px ${theme.colors.neutral['999']}43`,
+    color: theme.colors.neutral["000"],
+    boxShadow: `0 5px 7px -5px ${theme.colors.neutral["999"]}43`,
     display: 'block',
     outline: 0,
-    width: theme.space['x1/1'],
+    width: theme.space["x1/1"],
     border: `${theme.space.xpx} solid ${theme.colors[buttonVariant][900]}`,
     borderRadius: theme.space.x2,
     paddingHorizontal: {
       xs: theme.space.x5,
-      sm: theme.space.x10,
+      sm: theme.space.x10
     },
     paddingVertical: theme.space.x3,
     transition: 'all 0.2s ease-in-out',
@@ -276,10 +253,12 @@ export function Button({ as, styleSheet, ...props }) {
     },
     ...restStyleSheet,
   };
+  
 
-  return <Text as={tag} styleSheet={finalStyleSheet} {...props} />;
+  return (
+    <Text as={tag} styleSheet={finalStyleSheet} {...props} />
+  );
 }
-
 Button.defaultProps = {
   styleSheet: {},
 };
